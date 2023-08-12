@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tjoeun.dao.ElecapprsawonDAO">
+
+
+	<!-- 사원 본인이 올린 결재글의 전체 개수를 얻어온다. -->
+	<select id="selectsawonCount" parameterType="int" resultType="int">
+		select count(*) from elecappr where cnum = #{cnum}
+	</select>
+
+
+	<!-- 1페이지 분량의 사원 본인이 올린 결재글을 얻어온다. -->
+	<select id="selectsawonList" parameterType="java.util.HashMap" resultType="eo">
+		SELECT * FROM(
+          SELECT ROWNUM rnum, TT.* FROM (
+              SELECT * FROM elecappr where cnum = #{cnum} ORDER BY idx DESC
+          ) TT
+      ) WHERE rnum BETWEEN #{startNo} AND #{endNo}
+	</select>
+
+	
+	<!-- 사원 본인이 올린 결재글 1건을 얻어온다. -->
+	<select id="selectsawonIdx" parameterType="int" resultType="eo">
+		select * from elecappr where idx = #{idx}
+	</select>	
+	
+	
+	<!-- 사원 본인이 올린 결재글 1 건을 삭제한다. -->
+	<delete id="delete" parameterType="int">
+		delete from elecappr where idx = #{idx}
+	</delete>
+	
+	<!-- 글 번호 재배열 -->
+	<update id="rearrangeIndices" parameterType="int">
+		update elecappr set idx = idx - 1 where idx > #{idx}
+	</update>
+	
+	<!-- 시퀀스 증가값을 -1로 변경 -->
+	<update id="alterSeqUp">
+		alter sequence elecappr_idx_seq increment by -1
+	</update>
+	
+	<!-- 시퀀스 값 증가값 적용하기 -->
+	<update id="selectCur">
+		select elecappr_idx_seq.nextval from elecappr where idx = 1
+	</update>
+	
+	<!-- 시퀀스 증가값을 1로 변경 -->
+	<update id="alterSeqDown">
+		alter sequence elecappr_idx_seq increment by 1
+	</update>
+	
+	<!-- 사원 본인이 올린 결재글 1 건을 수정한당 -->
+	<update id="update" parameterType="eo">
+		update elecappr set subject = #{subject}, content = #{content} where idx = #{idx}
+	</update>
+	
+	
+</mapper>

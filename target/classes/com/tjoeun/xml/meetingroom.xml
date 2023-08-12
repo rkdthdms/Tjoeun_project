@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.tjoeun.dao.MeetingRoomDAO">
+
+	 <!-- 회의실 모든 정보 가져오기  -->
+    <select id="countAllMeetingRooms" resultType="int">
+        SELECT count(*) FROM MeetingRoom
+    </select>
+    
+    <!-- room_id에 해당하는 회의실 정보 가져오기  -->
+    <select id="getMeetingRoomById" parameterType="int" resultType="mro">
+        SELECT * FROM MeetingRoom WHERE room_id = #{roomId}
+    </select>
+    
+     <!-- 새로운 회의실 예약 정보를 데이터베이스에 추가하기  -->
+    <insert id="meetingInsert" parameterType="mro">
+        INSERT INTO MeetingRoom (room_id, user_name, meetingDate, meetingTime)
+        VALUES (#{room_Id}, #{user_Name}, #{meetingDate}, #{meetingTime})
+    </insert>
+    
+    <!-- 1페이지 분량의 메인글을 얻어온다. -->
+	<select id="getAllMeetingRooms" parameterType="java.util.HashMap" resultType="mro">
+		<![CDATA[
+		select * from (
+			select rownum rnum, TT.* from (
+				select * from meetingroom order by room_id desc
+			) TT where rownum <= #{endNo}
+		) where rnum >= #{startNo}
+		]]>
+		</select>
+</mapper>
